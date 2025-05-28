@@ -1,0 +1,38 @@
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environment variables
+.env
+
+# Data directory
+data/
+
+# Test files
+tests/
+
+# System prompt collection
+/home/hoangtungvum/CODE/AI_Agent/agent_chatbot/app/core/systemprompt_collection/
+
+# Virtual environment
+venv/
+agent/
+
+# Database files
+*.db
+*.sqlite3
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+
+# IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Logs
+*.log

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Agent Chatbot</title>
+    <link rel="stylesheet" href="/frontend/assets/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2>Conversations</h2>
+                <button id="new-conversation-btn" title="New Conversation">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+            <div class="conversation-list" id="conversation-list">
+                <!-- Conversations will be loaded here dynamically -->
+                <div class="empty-state-message">
+                    <p>No conversations yet.</p>
+                    <p>Start a new conversation!</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Chat Area -->
+        <div class="main-content">
+            <div class="chat-header">
+                <h1>AI Agent Chatbot</h1>
+                <div class="conversation-actions" id="conversation-actions" style="display: none;">
+                    <button id="delete-conversation-btn" title="Delete Conversation">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="chat-messages" id="chat-messages">
+                <div class="welcome-message">
+                    <h2>Welcome to AI Agent Chatbot!</h2>
+                    <p>Ask me anything or select a previous conversation from the sidebar.</p>
+                </div>
+            </div>
+            
+            <div class="chat-input-container">
+                <form id="chat-form">
+                    <input type="text" id="user-input" placeholder="Type your message here..." autocomplete="off">
+                    <button type="submit" id="send-button">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Templates -->
+    <template id="conversation-item-template">
+        <div class="conversation-item" data-conversation-id="">
+            <div class="conversation-info">
+                <div class="conversation-title"></div>
+                <div class="conversation-timestamp"></div>
+            </div>
+        </div>
+    </template>
+
+    <template id="message-template">
+        <div class="message">
+            <div class="message-content">
+                <p></p>
+            </div>
+        </div>
+    </template>
+
+    <script src="/frontend/assets/js/script.js"></script>
+</body>
+</html>

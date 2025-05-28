@@ -1,0 +1,17 @@
+fastapi
+uvicorn[standard]
+langchain
+langchain-google-genai
+langgraph
+chromadb
+sqlalchemy
+pydantic
+python-dotenv
+google-search-results
+tiktoken
+langchainhub
+# PDF processing libraries
+PyPDF2
+sentence-transformers
+langchain-community
+langchain-google-community
