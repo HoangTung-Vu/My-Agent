@@ -8,7 +8,9 @@ from app.api.chat_router import router as chat_router
 from app.db.database import engine, Base
 
 # Create database tables
-Base.metadata.create_all(bind=engine)
+from app.db.database import init_db
+init_db()
+
 
 # Initialize FastAPI app
 app = FastAPI(
