@@ -10,3 +10,8 @@ llm = ChatGoogleGenerativeAI(
     model="gemini-2.0-flash",
     temperature=0.8
 )
+
+tools_llm = ChatGoogleGenerativeAI(
+    model="gemini-2.0-flash",
+    temperature=0.1
+)

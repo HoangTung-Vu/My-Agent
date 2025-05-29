@@ -42,7 +42,7 @@ def retrieve_documents(query: str, top_k: int = 5) -> str:
 
 # Create a Tool for LangChain
 doc_retriever = Tool(
-    name="document_retriever",
+    name="doc_retriever",
     description="Retrieve relevant information from stored documents based on a query",
     func=retrieve_documents,
 )
