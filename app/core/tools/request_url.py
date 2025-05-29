@@ -10,9 +10,10 @@ def fetch_webpage_content(url: str):
             response = requests.get(url, headers=headers)
             response.raise_for_status()
 
-            string_results = "URL :" + str(url) + "\n\n" + process_html_content(response.text)
+            string_results = process_html_content(response.text)
+            final_results = string_results[:2000] if len(string_results) > 2000 else string_results
             
-            return string_results
+            return final_results
         except Exception as e:
             return {"error": str(e)}
         

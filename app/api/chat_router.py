@@ -7,7 +7,7 @@ from uuid import UUID
 
 from app.db.database import get_db
 from app.db.crud import create_conversation, add_message_to_conversation, get_conversation_messages, get_all_conversations, delete_conversation
-from app.core import agent
+from app.core import main_agent
 
 router = APIRouter(prefix="/api", tags=["chat"])
 
@@ -23,7 +23,7 @@ async def process_chat(request: ChatRequest, db: Session = Depends(get_db)):
     
     # Store user message
     add_message_to_conversation(db, conversation_id, "user", request.message)
-    response, sources = await agent.process_message(request.message, conversation_id)
+    response, sources = await main_agent.process_message(request.message, conversation_id)
     add_message_to_conversation(db, conversation_id, "assistant", response)
     
     return ChatResponse(
