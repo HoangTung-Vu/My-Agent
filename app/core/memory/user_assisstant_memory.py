@@ -2,9 +2,8 @@ from app.core.memory.embedding import VietnameseSBERTEmbeddingFunction
 import chromadb
 
 
-client = chromadb.Client(
-    chromadb.PersistentClient(path="data/chromadb")
-)
+client = chromadb.PersistentClient(path="data/chromadb")
+
 
 embedding_function = VietnameseSBERTEmbeddingFunction()
 

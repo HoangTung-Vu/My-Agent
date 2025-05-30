@@ -10,8 +10,8 @@ class ToolsAgent :
         self.llm_with_tools = tools_llm.bind_tools(list(all_tools.values()))
         self.tools_map = all_tools
     
-    def select_tool(self, query: str, chat_history = List[BaseMessage]):
-        messages : List[BaseMessage] = list(chat_history)
+    def select_tool(self, query: str, recent_chat_history : List[BaseMessage]):
+        messages : List[BaseMessage] = list(recent_chat_history)
         messages.append(HumanMessage(content=query))
         response = self.llm_with_tools.invoke(messages)
         
