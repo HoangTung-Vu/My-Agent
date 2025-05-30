@@ -1,5 +1,7 @@
+import asyncio
 from app.core.memory.embedding import VietnameseSBERTEmbeddingFunction
 import chromadb
+import uuid # Import uuid
 
 
 client = chromadb.PersistentClient(path="data/chromadb")
@@ -7,50 +9,56 @@ client = chromadb.PersistentClient(path="data/chromadb")
 
 embedding_function = VietnameseSBERTEmbeddingFunction()
 
-def get_or_create_ua_collection():
+async def get_or_create_ua_collection():
     """
-    Get or Create User and Assistant memory collection
+    Get or Create User and Assistant memory collection asynchronously.
     
     Returns:
-        chromadb.Collection: The collection for user and assistant memory
+        tuple[chromadb.Collection, chromadb.Collection]: The user and assistant collections.
     """
-    user_collection = client.get_or_create_collection(
+    # Run synchronous chromadb client calls in a separate thread
+    user_collection = await asyncio.to_thread(
+        client.get_or_create_collection,
         name="user",
         embedding_function=embedding_function
     )
-    assistant_collection = client.get_or_create_collection(
+    assistant_collection = await asyncio.to_thread(
+        client.get_or_create_collection,
         name="assistant",
         embedding_function=embedding_function
     )
-
     return user_collection, assistant_collection
 
-def store_user_assistant_memory(role : str, text: str):
+async def store_user_assistant_memory(role : str, text: str):
     """
-    Store user or assistant memory in the respective collection.
+    Store user or assistant memory in the respective collection asynchronously.
     
     Args:
         role (str): The role of the message ('user' or 'assistant').
         text (str): The text to store in the memory.
     """
-    user_collection, assistant_collection = get_or_create_ua_collection()
+    user_collection, assistant_collection = await get_or_create_ua_collection()
     
+    collection_to_use = None
     if role == "user":
-        user_collection.add(
-            documents=[text],
-            ids=[str(len(user_collection.get()['ids']) + 1)]
-        )
+        collection_to_use = user_collection
     elif role == "assistant":
-        assistant_collection.add(
-            documents=[text],
-            ids=[str(len(assistant_collection.get()['ids']) + 1)]
-        )
+        collection_to_use = assistant_collection
     else:
         raise ValueError("Role must be either 'user' or 'assistant'.")
+
+    if collection_to_use:
+        new_id = str(uuid.uuid4()) # Use uuid for new_id
+        
+        await asyncio.to_thread(
+            collection_to_use.add,
+            documents=[text],
+            ids=[new_id]
+        )
     
-def retrieve_user_assistant_memory(role: str, query : str, limit: int = 5):
+async def retrieve_user_assistant_memory(role: str, query : str, limit: int = 5):
     """
-    Retrieve user or assistant memory based on a query.
+    Retrieve user or assistant memory based on a query asynchronously.
     
     Args:
         role (str): The role of the memory to retrieve ('user' or 'assistant').
@@ -60,19 +68,21 @@ def retrieve_user_assistant_memory(role: str, query : str, limit: int = 5):
     Returns:
         list: List of retrieved documents.
     """
-    user_collection, assistant_collection = get_or_create_ua_collection()
+    user_collection, assistant_collection = await get_or_create_ua_collection()
     
+    collection_to_query = None
     if role == "user":
-        results = user_collection.query(
-            query_texts=[query],
-            n_results=limit
-        )
+        collection_to_query = user_collection
     elif role == "assistant":
-        results = assistant_collection.query(
-            query_texts=[query],
-            n_results=limit
-        )
+        collection_to_query = assistant_collection
     else:
         raise ValueError("Role must be either 'user' or 'assistant'.")
-    
-    return results['documents']
+
+    if collection_to_query:
+        results = await asyncio.to_thread(
+            collection_to_query.query,
+            query_texts=[query],
+            n_results=limit
+        )
+        return results['documents']
+    return []

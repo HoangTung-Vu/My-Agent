@@ -40,7 +40,8 @@ def delete_conversation(db: Session, conversation_id: str):
     Delete a conversation and all its messages from the database.
     Returns True if successful, False if the conversation was not found.
     """
-    db.query(Message).filter(Message.conversation_id == conversation_id).delete()
+    # Messages will be deleted automatically due to cascade="all, delete-orphan"
+    # db.query(Message).filter(Message.conversation_id == conversation_id).delete() 
     result = db.query(Conversation).filter(Conversation.id == conversation_id).delete()
     db.commit()
     

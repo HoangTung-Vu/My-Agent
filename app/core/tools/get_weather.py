@@ -79,6 +79,6 @@ def get_weather_func(city_name: str = "") -> str:
 
 get_weather = Tool(
     name="get_weather",
-    description="Get current weather information for a city. If no city is provided, uses your current location based on IP address.",
+    description="Get current weather information for a city. If no city is provided, uses Hanoi as default.",
     func=get_weather_func
 )

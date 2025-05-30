@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Text
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Text, Index
 from sqlalchemy.sql import func
 from app.db.database import Base
 from sqlalchemy.orm import relationship
@@ -14,7 +14,7 @@ class Conversation(Base):
     id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
     system_prompt = Column(Text, nullable=True)
     created_at = Column(DateTime, default=func.now())
-    updated_at = Column(DateTime, default=func.now(), onupdate=func.now())
+    updated_at = Column(DateTime, default=func.now(), onupdate=func.now(), index=True) # Add index here
     messages = relationship("Message", back_populates="conversation", cascade="all, delete-orphan")
 
 class Message(Base):
@@ -30,3 +30,7 @@ class Message(Base):
     content = Column(Text)
     timestamp = Column(DateTime, default=func.now())
     conversation = relationship("Conversation", back_populates="messages")
+
+    __table_args__ = (
+        Index('ix_messages_conversation_id_timestamp', "conversation_id", "timestamp"),
+    )
