@@ -1,18 +1,18 @@
 // Global state
-let currentConversationId = null;
-let conversations = [];
+let currentSessionId = null;
+let sessions = [];
 
 // DOM Elements
 const chatForm = document.getElementById('chat-form');
 const userInput = document.getElementById('user-input');
 const chatMessages = document.getElementById('chat-messages');
-const conversationList = document.getElementById('conversation-list');
-const newConversationBtn = document.getElementById('new-conversation-btn');
-const deleteConversationBtn = document.getElementById('delete-conversation-btn');
-const conversationActions = document.getElementById('conversation-actions');
+const sessionList = document.getElementById('conversation-list');
+const newSessionBtn = document.getElementById('new-conversation-btn');
+const deleteSessionBtn = document.getElementById('delete-conversation-btn');
+const sessionActions = document.getElementById('conversation-actions');
 
 // Templates
-const conversationItemTemplate = document.getElementById('conversation-item-template');
+const sessionItemTemplate = document.getElementById('conversation-item-template');
 const messageTemplate = document.getElementById('message-template');
 
 // Initialize the application
@@ -20,8 +20,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Focus on input field
     userInput.focus();
     
-    // Load conversations
-    loadConversations();
+    // Load sessions
+    loadSessions();
     
     // Add event listeners
     setupEventListeners();
@@ -29,36 +29,36 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Set up event listeners
 function setupEventListeners() {
-    // New conversation button
-    newConversationBtn.addEventListener('click', createNewConversation);
+    // New session button
+    newSessionBtn.addEventListener('click', createNewSession);
     
-    // Delete conversation button
-    deleteConversationBtn.addEventListener('click', deleteCurrentConversation);
+    // Delete session button
+    deleteSessionBtn.addEventListener('click', deleteCurrentSession);
     
     // Chat form submission
     chatForm.addEventListener('submit', handleChatFormSubmit);
 }
 
-// Create a new conversation
-async function createNewConversation() {
+// Create a new session
+async function createNewSession() {
     try {
-        // Clear current conversation UI
+        // Clear current session UI
         clearChatMessages();
         showWelcomeMessage();
         
-        // Reset current conversation ID
-        currentConversationId = null;
+        // Reset current session ID
+        currentSessionId = null;
         
-        // Update UI to reflect new conversation
-        updateActiveConversation(null);
-        conversationActions.style.display = 'none';
+        // Update UI to reflect new session
+        updateActiveSession(null);
+        sessionActions.style.display = 'none';
         
         // Focus on input
         userInput.focus();
         
     } catch (error) {
-        console.error('Error creating new conversation:', error);
-        showErrorMessage('Failed to create a new conversation. Please try again.');
+        console.error('Error creating new session:', error);
+        showErrorMessage('Failed to create a new session. Please try again.');
     }
 }
 
@@ -87,7 +87,7 @@ async function handleChatFormSubmit(e) {
             },
             body: JSON.stringify({
                 message: message,
-                conversation_id: currentConversationId
+                session_id: currentSessionId
             })
         });
         
@@ -97,16 +97,16 @@ async function handleChatFormSubmit(e) {
         
         const data = await response.json();
         
-        // Update conversation ID if this is a new conversation
-        if (!currentConversationId) {
-            currentConversationId = data.conversation_id;
-            conversationActions.style.display = 'block';
+        // Update session ID if this is a new session
+        if (!currentSessionId) {
+            currentSessionId = data.session_id;
+            sessionActions.style.display = 'block';
             
-            // Reload conversations to include the new one
-            await loadConversations();
+            // Reload sessions to include the new one
+            await loadSessions();
             
-            // Update the active conversation
-            updateActiveConversation(currentConversationId);
+            // Update the active session
+            updateActiveSession(currentSessionId);
         }
         
         // Remove typing indicator
@@ -125,85 +125,85 @@ async function handleChatFormSubmit(e) {
     }
 }
 
-// Load all conversations
-async function loadConversations() {
+// Load all sessions
+async function loadSessions() {
     try {
-        const response = await fetch('/api/conversations');
+        const response = await fetch('/api/sessions');
         
         if (!response.ok) {
             throw new Error(`API Error: ${response.status}`);
         }
         
-        conversations = await response.json();
+        sessions = await response.json();
         
-        // Clear conversation list
-        while (conversationList.firstChild) {
-            conversationList.removeChild(conversationList.firstChild);
+        // Clear session list
+        while (sessionList.firstChild) {
+            sessionList.removeChild(sessionList.firstChild);
         }
         
-        if (conversations.length === 0) {
+        if (sessions.length === 0) {
             // Show empty state
             const emptyState = document.createElement('div');
             emptyState.classList.add('empty-state-message');
             emptyState.innerHTML = `
-                <p>No conversations yet.</p>
-                <p>Start a new conversation!</p>
+                <p>No sessions yet.</p>
+                <p>Start a new session!</p>
             `;
-            conversationList.appendChild(emptyState);
+            sessionList.appendChild(emptyState);
         } else {
-            // Add conversations to list
-            conversations.forEach(conversation => {
-                addConversationToList(conversation);
+            // Add sessions to list
+            sessions.forEach(session => {
+                addSessionToList(session);
             });
         }
         
     } catch (error) {
-        console.error('Error loading conversations:', error);
-        showErrorMessage('Failed to load conversations. Please refresh the page.');
+        console.error('Error loading sessions:', error);
+        showErrorMessage('Failed to load sessions. Please refresh the page.');
     }
 }
 
-// Add a conversation to the list
-function addConversationToList(conversation) {
+// Add a session to the list
+function addSessionToList(session) {
     // Clone the template
-    const conversationItem = document.importNode(conversationItemTemplate.content, true).querySelector('.conversation-item');
+    const sessionItem = document.importNode(sessionItemTemplate.content, true).querySelector('.conversation-item');
     
-    // Set conversation ID
-    conversationItem.dataset.conversationId = conversation.id;
+    // Set session ID
+    sessionItem.dataset.conversationId = session.id;
     
     // Get first few characters of system_prompt or first message as title
-    const title = conversation.system_prompt 
-        ? conversation.system_prompt.substring(0, 30) + (conversation.system_prompt.length > 30 ? '...' : '')
-        : 'Conversation';
+    const title = session.system_prompt 
+        ? session.system_prompt.substring(0, 30) + (session.system_prompt.length > 30 ? '...' : '')
+        : 'Session';
     
     // Format date
-    const date = new Date(conversation.updated_at);
+    const date = new Date(session.updated_at);
     const formattedDate = date.toLocaleString();
     
     // Set content
-    conversationItem.querySelector('.conversation-title').textContent = title;
-    conversationItem.querySelector('.conversation-timestamp').textContent = formattedDate;
+    sessionItem.querySelector('.conversation-title').textContent = title;
+    sessionItem.querySelector('.conversation-timestamp').textContent = formattedDate;
     
     // Add click event
-    conversationItem.addEventListener('click', () => loadConversation(conversation.id));
+    sessionItem.addEventListener('click', () => loadSession(session.id));
     
     // Add to list
-    conversationList.appendChild(conversationItem);
+    sessionList.appendChild(sessionItem);
     
-    // Mark as active if it's the current conversation
-    if (conversation.id === currentConversationId) {
-        conversationItem.classList.add('active');
+    // Mark as active if it's the current session
+    if (session.id === currentSessionId) {
+        sessionItem.classList.add('active');
     }
 }
 
-// Load a specific conversation
-async function loadConversation(conversationId) {
+// Load a specific session
+async function loadSession(sessionId) {
     try {
         // Show loading state
         clearChatMessages();
         addTypingIndicator();
         
-        const response = await fetch(`/api/conversations/${conversationId}`);
+        const response = await fetch(`/api/sessions/${sessionId}`);
         
         if (!response.ok) {
             throw new Error(`API Error: ${response.status}`);
@@ -211,14 +211,14 @@ async function loadConversation(conversationId) {
         
         const messages = await response.json();
         
-        // Update current conversation ID
-        currentConversationId = conversationId;
+        // Update current session ID
+        currentSessionId = sessionId;
         
         // Show delete button
-        conversationActions.style.display = 'block';
+        sessionActions.style.display = 'block';
         
-        // Update active conversation in list
-        updateActiveConversation(conversationId);
+        // Update active session in list
+        updateActiveSession(sessionId);
         
         // Remove typing indicator
         removeTypingIndicator();
@@ -233,22 +233,22 @@ async function loadConversation(conversationId) {
         }
         
     } catch (error) {
-        console.error('Error loading conversation:', error);
+        console.error('Error loading session:', error);
         removeTypingIndicator();
-        showErrorMessage('Failed to load conversation. Please try again.');
+        showErrorMessage('Failed to load session. Please try again.');
     }
 }
 
-// Delete the current conversation
-async function deleteCurrentConversation() {
-    if (!currentConversationId) return;
+// Delete the current session
+async function deleteCurrentSession() {
+    if (!currentSessionId) return;
     
-    if (!confirm('Are you sure you want to delete this conversation? This action cannot be undone.')) {
+    if (!confirm('Are you sure you want to delete this session? This action cannot be undone.')) {
         return;
     }
     
     try {
-        const response = await fetch(`/api/conversations/${currentConversationId}`, {
+        const response = await fetch(`/api/sessions/${currentSessionId}`, {
             method: 'DELETE'
         });
         
@@ -256,30 +256,30 @@ async function deleteCurrentConversation() {
             throw new Error(`API Error: ${response.status}`);
         }
         
-        // Create a new conversation
-        createNewConversation();
+        // Create a new session
+        createNewSession();
         
-        // Reload conversations
-        await loadConversations();
+        // Reload sessions
+        await loadSessions();
         
     } catch (error) {
-        console.error('Error deleting conversation:', error);
-        showErrorMessage('Failed to delete conversation. Please try again.');
+        console.error('Error deleting session:', error);
+        showErrorMessage('Failed to delete session. Please try again.');
     }
 }
 
-// Update the active conversation in the UI
-function updateActiveConversation(conversationId) {
-    // Remove active class from all conversation items
+// Update the active session in the UI
+function updateActiveSession(sessionId) {
+    // Remove active class from all session items
     document.querySelectorAll('.conversation-item').forEach(item => {
         item.classList.remove('active');
     });
     
-    // Add active class to current conversation item
-    if (conversationId) {
-        const conversationItem = document.querySelector(`.conversation-item[data-conversation-id="${conversationId}"]`);
-        if (conversationItem) {
-            conversationItem.classList.add('active');
+    // Add active class to current session item
+    if (sessionId) {
+        const sessionItem = document.querySelector(`.conversation-item[data-conversation-id="${sessionId}"]`);
+        if (sessionItem) {
+            sessionItem.classList.add('active');
         }
     }
 }

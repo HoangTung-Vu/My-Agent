@@ -4,10 +4,10 @@ from datetime import datetime
 
 class Message(BaseModel):
     """
-    Model for a message in a conversation.
+    Model for a message in a session.
     """
     id : Optional[int] = None
-    conversation_id : str
+    session_id : str
     role : str  
     content : str
     timestamp : datetime 
@@ -16,9 +16,9 @@ class Message(BaseModel):
         orm_mode = True  # Allows Pydantic to work with SQLAlchemy models
 
 
-class Conversation(BaseModel):
+class Session(BaseModel):
     """
-    Model for a conversation.
+    Model for a session.
     """
     id : Optional[str] = None  
     system_prompt : Optional[str] = None  
